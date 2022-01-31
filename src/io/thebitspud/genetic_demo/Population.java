@@ -30,6 +30,8 @@ public class Population {
 
     /** Advances the simulation by the specified number of generations */
     public void advance(int count) {
+        System.out.println("Advancing " + count + " generations...");
+
         for (int i = 0; i < count; i++) {
             generation++;
             select();
@@ -38,7 +40,6 @@ public class Population {
         }
 
         // Only doing this once at the end (computeStats is costly)
-        System.out.println("Advancing " + count + " generations...");
         computeStats();
     }
 
