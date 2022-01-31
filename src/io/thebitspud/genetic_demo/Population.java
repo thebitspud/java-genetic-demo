@@ -3,6 +3,7 @@ package io.thebitspud.genetic_demo;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Represents the current generation's set of candidate solutions
@@ -23,6 +24,7 @@ public class Population {
             genomes.add(new Genome(Main.GENOME_LENGTH));
         }
 
+        sortGenomes();
         computeStats();
     }
 
@@ -53,29 +55,11 @@ public class Population {
         generation++;
     }
 
-    /**
-     * Performs a truncation selection operation,
-     * Thanos snapping the bottom (i.e. least fit) half of genomes
-     */
+    /** Reduces the population via a selection operation */
     public void select() {
-        // Cull genomes with fitness below median
-        for (int i = size - 1; i >= 0; i--) {
-            Genome g = genomes.get(i);
-            if (fit.evaluate(g) < med) {
-                genomes.remove(g);
-            }
-        }
-
-        if (genomes.size() <= size / 2) return;
-
-        // Cull genomes of median fitness until half or fewer remain
-        for (int i = genomes.size() - 1; i >= 0; i--) {
-            Genome g = genomes.get(i);
-            if (fit.evaluate(g) <= med) {
-                genomes.remove(g);
-                if (genomes.size() <= size / 2) return;
-            }
-        }
+        // Performing a truncation selection operation by clearing the
+        // bottom half of genomes from a pre-sorted list.
+        genomes.subList(size / 2, size).clear();
     }
 
     /** Grows the population to capacity via propagation operations */
@@ -95,6 +79,13 @@ public class Population {
                 genomes.add(new Genome(genomes.get(0)));
             }
         }
+
+        sortGenomes();
+    }
+
+    /** Sorts genomes by fitness in descending order */
+    public void sortGenomes() {
+        genomes.sort(Comparator.comparingDouble(g -> -fit.evaluate(g)));
     }
 
     /** Computes the population median separately */

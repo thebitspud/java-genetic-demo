@@ -1,7 +1,7 @@
 package io.thebitspud.genetic_demo;
 
 /**
- * Represents the genetic algorithm's fitness function
+ * Represents a fitness function for the genetic algorithm
  */
 public interface FitnessFunction {
     /**
