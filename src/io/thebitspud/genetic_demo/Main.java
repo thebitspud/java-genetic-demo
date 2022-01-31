@@ -13,8 +13,10 @@ public class Main {
     public static final int POPULATION_SIZE = 100; // >= 2
     public static final boolean GUARANTEE_MAX = true;
     public static final boolean DO_CROSSOVER = true;
+    /** Proportion of genomes that survive and reproduce each generation */
+    public static final float ELITISM_RATE = 0.5f; // in (0,1)
     /** Average mutations per gene location per generation */
-    public static final float MUTATION_RATE = 1f / GENOME_LENGTH; // in [0,1]
+    public static final float MUTATION_RATE = 1f / GENOME_LENGTH; // in (0,1)
 
     public static final long SEED = (new Random()).nextLong();
     public static final Random r = new Random(SEED);

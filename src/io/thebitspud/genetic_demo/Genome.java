@@ -6,9 +6,11 @@ package io.thebitspud.genetic_demo;
 public class Genome {
     /** Represents solution parameters as genetic information */
     private char[] genes;
+    private int generation;
 
     /** Creates a new genome of specified length with random genes */
-    public Genome(int length) {
+    public Genome(int length, int generation) {
+        this.generation = generation;
         genes = new char[length];
 
         for (int i = 0; i < length; i++) {
@@ -18,13 +20,15 @@ public class Genome {
     }
 
     /** Creates a new genome via cloning, then mutating */
-    public Genome(Genome parent) {
+    public Genome(Genome parent, int generation) {
+        this.generation = generation;
         genes = parent.genes.clone();
         mutate();
     }
 
     /** Creates a new genome via crossover, then mutating */
-    public Genome(Genome p1, Genome p2) {
+    public Genome(Genome p1, Genome p2, int generation) {
+        this.generation = generation;
         genes = new char[Math.min(p1.getLength(), p2.getLength())];
 
         // Random uniform crossover
@@ -60,6 +64,11 @@ public class Genome {
     /** Returns the gene value at the specified index */
     public char getGene(int index) {
         return genes[index];
+    }
+
+    /** Returns the generation in which this genome was created */
+    public int getGeneration() {
+        return generation;
     }
 
     /** Returns a string representation of the gene array */

@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * Represents the current generation's set of candidate solutions
+ * Represents a set of candidate solutions to a fitness function
  */
 public class Population {
     private ArrayList<Genome> genomes = new ArrayList<>();
@@ -21,7 +21,7 @@ public class Population {
 
         // Initialize a set of random genomes
         for (int i = 0; i < size; i++) {
-            genomes.add(new Genome(Main.GENOME_LENGTH));
+            genomes.add(new Genome(Main.GENOME_LENGTH, generation));
         }
 
         sortGenomes();
@@ -30,36 +30,33 @@ public class Population {
 
     /** Advances the simulation by the specified number of generations */
     public void advance(int count) {
-        if (count <= 1) {
-            advance();
-            return;
-        }
-
         for (int i = 0; i < count; i++) {
+            generation++;
             select();
             propagate();
             computeMedian();
         }
 
-        // Only doing this once at the end to improve run time
+        // Only doing this once at the end (computeStats is costly)
         System.out.println("Advancing " + count + " generations...");
         computeStats();
-        generation += count;
     }
 
     /** Advances the simulation by one generation via genetic operations */
     public void advance() {
+        generation++;
         select();
         propagate();
         computeStats();
-        generation++;
     }
 
     /** Reduces the population via a selection operation */
     public void select() {
-        // Performing a truncation selection operation by clearing the
-        // bottom half of genomes from a pre-sorted list.
-        genomes.subList(size / 2, size).clear();
+        // Performing a truncation selection operation by removing
+        // the bottom (least fit) genomes from the population
+        int start = Math.round(size * Main.ELITISM_RATE);
+        start = Math.max(Math.min(start, size - 1), 1);
+        genomes.subList(start, size).clear();
     }
 
     /** Grows the population to capacity via propagation operations */
@@ -71,12 +68,12 @@ public class Population {
             while (genomes.size() < size) {
                 final Genome p1 = genomes.get(Main.r.nextInt(validParents));
                 final Genome p2 = genomes.get(Main.r.nextInt(validParents));
-                genomes.add(new Genome(p1, p2));
+                genomes.add(new Genome(p1, p2, generation));
             }
         } else {
             // Cloning
             while (genomes.size() < size) {
-                genomes.add(new Genome(genomes.get(0)));
+                genomes.add(new Genome(genomes.get(0), generation));
             }
         }
 
@@ -132,8 +129,10 @@ public class Population {
 
         // Printing genome information
         for (int i = 0; i < size; i++) {
-            String data = df2.format(i + 1) + " " + genomes.get(i)
-                    + " F:" + df.format(fit.evaluate(genomes.get(i)));
+            Genome g = genomes.get(i);
+            String data = df2.format(i + 1) + " " + g
+                    + "  Fit:" + df.format(fit.evaluate(g))
+                    + "  Gen:" + g.getGeneration();
             System.out.println(data);
         }
 
@@ -146,7 +145,7 @@ public class Population {
     public String toString() {
         DecimalFormat df = new DecimalFormat("0.000");
 
-        return "Generation " + generation
+        return "Generation: " + generation
                 + "  Population: " + size
                 + "\nMax: " + df.format(max)
                 + "  Min: " + df.format(min)
