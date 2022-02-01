@@ -2,8 +2,8 @@ package io.thebitspud.genetic_demo;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 
 /**
  * Represents a set of candidate solutions to a fitness function
@@ -29,35 +29,33 @@ public class Population {
     }
 
     /** Advances the simulation by the specified number of generations */
-    public void advance(int count) {
+    public void simulate(int count) {
         System.out.println("Advancing " + count + " generations...");
-
-        for (int i = 0; i < count; i++) {
-            generation++;
-            select();
-            propagate();
-            computeMedian();
-        }
+        for (int i = 0; i < count; i++) nextGeneration();
 
         // Only doing this once at the end (computeStats is costly)
         computeStats();
     }
 
-    /** Advances the simulation by one generation via genetic operations */
-    public void advance() {
+    /** Advances the simulation by one generation */
+    public void simulate() {
+        nextGeneration();
+        computeStats();
+    }
+
+    /** Performs genetic operations on genomes */
+    private void nextGeneration() {
         generation++;
         select();
         propagate();
-        computeStats();
+        sortGenomes();
     }
 
     /** Reduces the population via a selection operation */
     public void select() {
         // Performing a truncation selection operation by removing
         // the bottom (least fit) genomes from the population
-        int start = Math.round(size * Main.ELITISM_RATE);
-        start = Math.max(Math.min(start, size - 1), 1);
-        genomes.subList(start, size).clear();
+        genomes.subList(Main.ELITISM, size).clear();
     }
 
     /** Grows the population to capacity via propagation operations */
@@ -67,35 +65,24 @@ public class Population {
         if (Main.DO_CROSSOVER && validParents > 1) {
             // Crossover
             while (genomes.size() < size) {
-                final Genome p1 = genomes.get(Main.r.nextInt(validParents));
-                final Genome p2 = genomes.get(Main.r.nextInt(validParents));
+                Genome p1 = genomes.get(Main.r.nextInt(validParents));
+                Genome p2 = genomes.get(Main.r.nextInt(validParents));
                 genomes.add(new Genome(p1, p2, generation));
             }
         } else {
             // Cloning
             while (genomes.size() < size) {
-                genomes.add(new Genome(genomes.get(0), generation));
+                Genome parent = genomes.get(Main.r.nextInt(validParents));
+                genomes.add(new Genome(parent, generation));
             }
         }
-
-        sortGenomes();
     }
 
     /** Sorts genomes by fitness in descending order */
     public void sortGenomes() {
-        genomes.sort(Comparator.comparingDouble(g -> -fit.evaluate(g)));
-    }
-
-    /** Computes the population median separately */
-    public void computeMedian() {
-        float[] values = new float[size];
-
-        for (int i = 0; i < size; i++) {
-            values[i] = fit.evaluate(genomes.get(i));
-        }
-
-        Arrays.sort(values);
-        med = (values[size / 2] + values[(size - 1) / 2]) / 2;
+        HashMap<Genome, Float> evals = new HashMap<>();
+        for (Genome g: genomes) evals.put(g, -fit.evaluate(g));
+        genomes.sort(Comparator.comparing(evals::get));
     }
 
     /** Computes common population parameters */
@@ -104,8 +91,8 @@ public class Population {
         max = 0f;
         min = 1f;
 
-        for (int i = 0; i < size; i++) {
-            float eval = fit.evaluate(genomes.get(i));
+        for (Genome g: genomes) {
+            float eval = fit.evaluate(g);
             max = Math.max(max, eval);
             min = Math.min(min, eval);
             total += eval;
@@ -115,7 +102,9 @@ public class Population {
         mean = total / size;
         sd = (float) Math.sqrt(Math.max(0, total2 / size - Math.pow(mean, 2)));
 
-        computeMedian();
+        float med1 = fit.evaluate(genomes.get(size / 2));
+        float med2 = fit.evaluate(genomes.get((size - 1) / 2));
+        med = (med1 + med2) / 2;
     }
 
     /** Prints the population's raw genome and fitness data */

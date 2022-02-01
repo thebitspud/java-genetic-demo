@@ -29,7 +29,7 @@ public class Genome {
     /** Creates a new genome via crossover, then mutating */
     public Genome(Genome p1, Genome p2, int generation) {
         this.generation = generation;
-        genes = new char[Math.min(p1.getLength(), p2.getLength())];
+        genes = new char[p1.getLength()];
 
         // Random uniform crossover
         for (int i = 0; i < getLength(); i++) {
@@ -43,6 +43,7 @@ public class Genome {
     public void mutate() {
         if (Main.UNIQUE_GENES < 2) return;
 
+        // Probabilities can be modeled using a binomial distribution
         for (int i = 0; i < getLength(); i++) {
             if (Main.r.nextFloat() < Main.MUTATION_RATE) {
                 char newGene;

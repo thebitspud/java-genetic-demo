@@ -8,15 +8,16 @@ import java.util.Scanner;
  */
 public class Main {
     // Simulation config constants
-    public static final int GENOME_LENGTH = 32; // >= 1
-    public static final int UNIQUE_GENES = 4; // in [2,26]
-    public static final int POPULATION_SIZE = 100; // >= 2
-    public static final boolean GUARANTEE_MAX = true;
+    public static final int GENOME_LENGTH = 64; // > 0
+    public static final int UNIQUE_GENES = 26; // >= 2
+    public static final int POPULATION_SIZE = 50; // >= 2
+    /** Number of genomes that survive and reproduce each generation */
+    public static final int ELITISM = 10; // > 0
     public static final boolean DO_CROSSOVER = true;
-    /** Proportion of genomes that survive and reproduce each generation */
-    public static final float ELITISM_RATE = 0.5f; // in (0,1)
-    /** Average mutations per gene location per generation */
+    /** Average mutations per gene location */
     public static final float MUTATION_RATE = 1f / GENOME_LENGTH; // in (0,1)
+    /** Guarantee every gene location has a 1.0 allele */
+    public static final boolean GUARANTEE_MAX = true;
 
     public static final long SEED = (new Random()).nextLong();
     public static final Random r = new Random(SEED);
@@ -41,6 +42,7 @@ public class Main {
                     printHelp();
                     break;
                 case "i":
+                    System.out.println("Seed: " + SEED + "\n");
                     pop.printDetails();
                     break;
                 case "r":
@@ -79,13 +81,13 @@ public class Main {
                 }
 
                 // Advance only if a valid parameter is provided
-                pop.advance(count);
+                pop.simulate(count);
             } catch (NumberFormatException e) {
                 System.out.println("Invalid parameter '" + input[1] + "'");
                 return;
             }
         } else {
-            pop.advance();
+            pop.simulate();
         }
 
         System.out.println(pop);

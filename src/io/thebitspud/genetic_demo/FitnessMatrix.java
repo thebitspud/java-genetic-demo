@@ -28,7 +28,7 @@ public class FitnessMatrix implements FitnessFunction {
                 }
             }
 
-            // Guarantee every location has a 1.0 gene
+            // Guarantee every location has a 1.0 allele
             if (Main.GUARANTEE_MAX) values[i][maxIndex] = 1;
         }
     }
