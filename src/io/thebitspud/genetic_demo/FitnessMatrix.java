@@ -18,7 +18,7 @@ public class FitnessMatrix implements FitnessFunction {
             int maxIndex = 0;
 
             for (int j = 0; j < values[0].length; j++) {
-                float value = Main.r.nextFloat();
+                float value = (float) Main.r.nextDouble();
                 // Setting the value of gene j when at location i
                 values[i][j] = value;
 

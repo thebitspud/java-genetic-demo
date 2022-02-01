@@ -1,6 +1,6 @@
 package io.thebitspud.genetic_demo;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 import java.util.Scanner;
 
 /**
@@ -19,8 +19,8 @@ public class Main {
     /** Guarantee every gene location has a 1.0 allele */
     public static final boolean GUARANTEE_MAX = true;
 
-    public static final long SEED = (new Random()).nextLong();
-    public static final Random r = new Random(SEED);
+    public static final long SEED = (new SplittableRandom()).nextLong();
+    public static final SplittableRandom r = new SplittableRandom(SEED);
 
     public static void main(String[] args) {
 	    Population pop = new Population(POPULATION_SIZE);

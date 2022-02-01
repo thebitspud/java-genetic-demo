@@ -45,7 +45,7 @@ public class Genome {
 
         // Probabilities can be modeled using a binomial distribution
         for (int i = 0; i < getLength(); i++) {
-            if (Main.r.nextFloat() < Main.MUTATION_RATE) {
+            if (Main.r.nextDouble() < Main.MUTATION_RATE) {
                 char newGene;
 
                 // Preventing identical substitutions from occurring
